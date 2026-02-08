@@ -190,7 +190,7 @@ function SkillTree({ tree, stats, onUnlock }) {
             <div style={{ fontSize: 8, letterSpacing: 2, color: "#333", marginBottom: 4, paddingLeft: 2 }}>
               {["FOUNDATION", "INTERMEDIATE", "ADVANCED", "MASTERY"][t]}
             </div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <div className="tier-row">
               {nodes.map(node => {
                 const st = status(node);
                 return (
@@ -521,6 +521,7 @@ export default function LifeRPG() {
   /* ═══════ RENDER ═══════ */
   return (
     <div style={S.app}><style>{CSS}</style>
+      <div className="app-shell">
 
       {/* Popups */}
       {popup && (
@@ -550,7 +551,7 @@ export default function LifeRPG() {
       </header>
 
       {/* XP + Energy bars */}
-      <div style={{ padding: "4px 16px 0" }}>
+      <div className="bar-area" style={{ padding: "4px 16px 0" }}>
         <div style={S.barWrap}>
           <div style={{ ...S.barFill, width: `${xpPct}%`, background: "linear-gradient(90deg,#f1c40f,#e67e22)" }} />
           <div style={S.barLabel}>{lv.currentXp}/{lv.needed} XP</div>
@@ -581,7 +582,7 @@ export default function LifeRPG() {
       </nav>
 
       {/* Content */}
-      <div style={S.content}>
+      <div className="content-area" style={S.content}>
 
         {/* ═══ DASHBOARD ═══ */}
         {view === "dashboard" && (
@@ -614,7 +615,7 @@ export default function LifeRPG() {
 
             {/* Stats */}
             <h2 style={S.h2}>Character Stats</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <div className="stats-grid">
               {data.stats.map((stat, i) => {
                 const sl = getLevel(stat.xp);
                 const pct = (sl.currentXp / sl.needed) * 100;
@@ -632,7 +633,7 @@ export default function LifeRPG() {
             </div>
 
             {/* Lifetime stats */}
-            <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <div className="summary-row">
               {[
                 { v: data.completedLog.length, l: "QUESTS", c: "#f1c40f" },
                 { v: data.activityLog?.length || 0, l: "LOGGED", c: "#3498db" },
@@ -656,7 +657,7 @@ export default function LifeRPG() {
               <button style={{ ...S.ghost, fontSize: 11 }} onClick={() => setModal("addActivity")}>+ Custom</button>
             </div>
             <p style={{ fontSize: 12, color: "#555", marginBottom: 12, fontStyle: "italic" }}>Tap to earn XP. Each costs 5 energy.</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            <div className="activity-grid">
               {data.activities.map(act => {
                 const stat = data.stats[act.stat];
                 return (
@@ -760,7 +761,7 @@ export default function LifeRPG() {
             <h2 style={S.h2}>Skill Trees</h2>
             <p style={{ fontSize: 12, color: "#555", marginBottom: 14, fontStyle: "italic" }}>Level up stats to unlock nodes. Each shows required stat levels.</p>
             {!selectedTree ? (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+              <div className="tree-grid">
                 {data.skillTrees.map(tree => {
                   const done = tree.nodes.filter(n => n.unlocked).length;
                   const total = tree.nodes.length;
@@ -794,7 +795,7 @@ export default function LifeRPG() {
           <div>
             <h2 style={S.h2}>Achievements</h2>
             <div style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>{data.unlockedAchievements.length}/{ACHIEVEMENTS.length} unlocked</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <div className="achievement-grid">
               {ACHIEVEMENTS.map(a => {
                 const u = data.unlockedAchievements.includes(a.id);
                 return (
@@ -969,6 +970,7 @@ export default function LifeRPG() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
@@ -984,28 +986,59 @@ const CSS = `
 .act-btn:hover { transform:scale(1.02); border-color:#2a2a3a!important; }
 .act-btn:active { transform:scale(0.98); }
 .quest-card:hover { border-color:#2a2a3a!important; }
+
+/* ─── Responsive ─── */
+.app-shell { max-width: 520px; margin: 0 auto; font-size: 14px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.activity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.summary-row { display: flex; gap: 8px; margin-top: 14px; }
+.achievement-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tree-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tier-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+@media (min-width: 768px) {
+  .app-shell { max-width: 800px; font-size: 16px; }
+  .app-shell header { padding: 20px 28px 10px !important; }
+  .app-shell .content-area { padding: 18px 28px 80px !important; }
+  .app-shell .bar-area { padding: 6px 28px 0 !important; }
+  .app-shell nav { margin: 10px 28px 0 !important; }
+  .stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .activity-grid { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .summary-row { gap: 12px; }
+  .achievement-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .tree-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .tier-row { gap: 10px; }
+}
+
+@media (min-width: 1100px) {
+  .app-shell { max-width: 960px; font-size: 17px; }
+  .stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .activity-grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  .achievement-grid { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+  .tree-grid { grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+}
 `;
 
 /* ─── Styles ─── */
 const S = {
-  app: { minHeight: "100vh", background: "linear-gradient(160deg,#070710,#0e0e1a,#090912)", color: "#ddd", fontFamily: "var(--b)", maxWidth: 520, margin: "0 auto", position: "relative" },
+  app: { minHeight: "100vh", background: "linear-gradient(160deg,#070710,#0e0e1a,#090912)", color: "#ddd", fontFamily: "var(--b)", position: "relative" },
   center: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 },
   setupBox: { background: "#0e0e1aee", border: "1px solid #1e1e30", borderRadius: 14, padding: 36, textAlign: "center", maxWidth: 360, width: "100%" },
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px 6px" },
-  avatar: { width: 40, height: 40, borderRadius: "50%", background: "#14142a", border: "2px solid #f1c40f18", display: "flex", alignItems: "center", justifyContent: "center" },
-  lvBadge: { background: "linear-gradient(135deg,#f1c40f,#e67e22)", color: "#000", fontWeight: 800, fontSize: 11, padding: "2px 8px", borderRadius: 5, fontFamily: "var(--m)" },
-  streakBadge: { background: "#10101e", border: "1px solid #222", padding: "2px 7px", borderRadius: 5, fontSize: 11, fontWeight: 600 },
+  avatar: { width: 48, height: 48, borderRadius: "50%", background: "#14142a", border: "2px solid #f1c40f18", display: "flex", alignItems: "center", justifyContent: "center" },
+  lvBadge: { background: "linear-gradient(135deg,#f1c40f,#e67e22)", color: "#000", fontWeight: 800, fontSize: 12, padding: "3px 10px", borderRadius: 5, fontFamily: "var(--m)" },
+  streakBadge: { background: "#10101e", border: "1px solid #222", padding: "3px 9px", borderRadius: 5, fontSize: 12, fontWeight: 600 },
   gearBtn: { background: "none", border: "none", fontSize: 16, cursor: "pointer", padding: 4 },
-  barWrap: { height: 11, background: "#0a0a14", borderRadius: 6, position: "relative", overflow: "hidden", border: "1px solid #161626" },
-  barFill: { height: "100%", borderRadius: 6, transition: "width 0.4s ease" },
-  barLabel: { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px #000", fontFamily: "var(--m)", letterSpacing: 0.5 },
+  barWrap: { height: 14, background: "#0a0a14", borderRadius: 7, position: "relative", overflow: "hidden", border: "1px solid #161626" },
+  barFill: { height: "100%", borderRadius: 7, transition: "width 0.4s ease" },
+  barLabel: { position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 700, color: "#fff", textShadow: "0 1px 2px #000", fontFamily: "var(--m)", letterSpacing: 0.5 },
   nav: { display: "flex", margin: "8px 16px 0", background: "#090912", borderRadius: 9, overflow: "hidden", border: "1px solid #151522" },
-  navItem: { flex: 1, background: "transparent", border: "none", color: "#444", padding: "8px 0", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, fontFamily: "var(--b)", transition: "all 0.2s" },
-  navActive: { flex: 1, background: "#f1c40f08", border: "none", color: "#f1c40f", padding: "8px 0", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 1, fontFamily: "var(--b)", borderBottom: "2px solid #f1c40f" },
+  navItem: { flex: 1, background: "transparent", border: "none", color: "#444", padding: "10px 0", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, fontFamily: "var(--b)", transition: "all 0.2s", fontSize: "inherit" },
+  navActive: { flex: 1, background: "#f1c40f08", border: "none", color: "#f1c40f", padding: "10px 0", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, fontFamily: "var(--b)", borderBottom: "2px solid #f1c40f", fontSize: "inherit" },
   content: { padding: "12px 16px 80px" },
-  h2: { fontSize: 14, letterSpacing: 2, color: "#a0a0b0", margin: "0 0 8px", fontFamily: "var(--h)", fontWeight: 600 },
-  card: { background: "#0c0c16", border: "1px solid #161626", borderRadius: 9, padding: 10 },
-  miniBar: { height: 4, background: "#0a0a12", borderRadius: 2, overflow: "hidden" },
+  h2: { fontSize: 16, letterSpacing: 2, color: "#a0a0b0", margin: "0 0 10px", fontFamily: "var(--h)", fontWeight: 600 },
+  card: { background: "#0c0c16", border: "1px solid #161626", borderRadius: 10, padding: 12 },
+  miniBar: { height: 5, background: "#0a0a12", borderRadius: 3, overflow: "hidden" },
   miniBarFill: { height: "100%", borderRadius: 2, transition: "width 0.4s ease" },
   row: { display: "flex", alignItems: "center", gap: 8, padding: "7px 0", borderBottom: "1px solid #111118", fontSize: 13 },
   questRow: { display: "flex", alignItems: "center", gap: 8, background: "#0c0c16", border: "1px solid #161626", borderRadius: 9, padding: 10, marginBottom: 5, transition: "all 0.2s" },
